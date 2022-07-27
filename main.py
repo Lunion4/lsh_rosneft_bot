@@ -21,7 +21,7 @@ def weather(w_code):
         return 'снегопад'
     elif w_code == 95 or 96 or 99:
         return 'гроза'
-def is_rainy(s, times, rainy, code):
+def is_rainy(s1, times, rainy, code):
     s1 = datetime.now()+ timedelta(hours=12)
     all = list(zip(times, rainy, code))
     time_now = int(datetime.today().strftime('%H'))
@@ -32,10 +32,10 @@ def is_rainy(s, times, rainy, code):
             rain_start = all[i][0]
             break
     if rain_start == 0:
-        print("в ближайшее время дождик не планируется")
+        return "в ближайшее время дождик не планируется"
     else:
         rain_start = datetime.fromisoformat(rain_start)
-        print("Возьмите зонтики, дождик начнется в", rain_start.strftime('%H'), "с чем-то:)")
+        return "Возьмите зонтики, дождик начнется в", rain_start.strftime('%H'), "с чем-то:)"
 
 
 
@@ -60,22 +60,59 @@ def all_weather(message):
     message1 = ''
     for x in bl:
         if x[0] == s:
-            message1 += str(f"Температурка: {round(x[1])}℃ 🌡")
-            message1 += str(f"По ощущениям: {round(x[2])} ℃ 🌡")
-            message1 += str(f"Дождик: {x[3]} 🌧")
-            message1 += str(f"Снежок: {x[4]} ❄️")
-            message1 += str(f"Влажненько: {round(x[5])} % 💧")
-            message1 += str(f"Ветерок: {x[6]} м\с 🌬")
-            message1 += str(f"Злой ветерок: {x[7]} м\с 🌪")
-            message1 += str(f"Тучки {x[8]} ☁️")
+            message1 += str(f"Температурка: {round(x[1])}℃ 🌡 \n")
+            message1 += str(f"По ощущениям: {round(x[2])} ℃ 🌡 \n")
+            message1 += str(f"Дождик: {x[3]} 🌧\n")
+            message1 += str(f"Снежок: {x[4]} ❄️\n")
+            message1 += str(f"Влажненько: {round(x[5])} % 💧\n")
+            message1 += str(f"Ветерок: {x[6]} м\с 🪁\n")
+            message1 += str(f"Злой ветерок: {x[7]} м\с 🌪\n")
+            message1 += str(f"Тучки {x[8]} ☁️\n")
             break
     sunrise = forecast(shirota, dolgota)['daily']['sunrise']
     sunset = forecast(shirota, dolgota)['daily']['sunset']
-    message1 += str(f'Солнышко просыпается в {datetime.fromisoformat(sunrise[0]).time().isoformat(timespec="minutes")} 🌝')
-    message1 += str(f'Солнышко засыпает в {datetime.fromisoformat(sunset[0]).time().isoformat(timespec="minutes")} 🌚')
-    message1 += str(f'В общем {weather(w_code)}') 
-    message1 += str(is_rainy(s, b, a2, w_code))
+    message1 += str(f'Солнышко просыпается в {datetime.fromisoformat(sunrise[0]).time().isoformat(timespec="minutes")} 🌝\n')
+    message1 += str(f'Солнышко засыпает в {datetime.fromisoformat(sunset[0]).time().isoformat(timespec="minutes")} 🌚\n')
+    message1 += str(f'В общем {weather(w_code)} \n') 
+    #message1 += str(is_rainy(s, b, a2, w_code))
     bot.send_message(message.chat.id, message1)
 
+@bot.message_handler(commands=["wind"])
+def wind(message):
+    for x in bl:
+        if x[0] == s:
+            bot.send_message(message.chat.id, f"Ветерок: {x[6]} м\с 🪁\nЗлой ветерок: {x[7]} м\с 🌪")
+            break
+
+@bot.message_handler(commands=['rain'])
+def rainy_weather(message):
+    message1 = ''
+    for x in bl:
+        if x[0] == s:
+            message1 += str(f"Дождик: {x[3]}🌧\n")
+            message1 += str(f"Снежок: {x[4]}☃️\n")
+            #message1 += str(is_rainy(s, b, a2, w_code))
+            break
+    bot.send_message(message.chat.id, message1)
+
+@bot.message_handler(commands=['cloud'])
+def cloudcover(message):
+    message1 = ''
+    for x in bl:
+        if  x[0] == s:
+            message1 +=str(f"Тучки {x[8]}☁")
+            break
+    bot.send_message(message.chat.id, message1)
+
+@bot.message_handler(commands=['temp'])
+def temperature_weather(message):
+    message1 = ''
+    for x in bl:
+        if x[0] == s:
+            message1+=str(f"Температурка:{ round(x[1])}℃ 🌡\n")
+            message1+=str(f"По ощущениям:{round(x[2])} ℃ 🌡")
+            break
+
+    bot.send_message(message.chat.id, message1)
 
 bot.infinity_polling()
