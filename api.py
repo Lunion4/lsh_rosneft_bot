@@ -1,13 +1,13 @@
 import requests
 from datetime import datetime, timedelta
-import telebot
 
 
-bot = telebot.TeleBot("5434796681:AAE2L-1SX3evqsgGZphxg-UQNCZrmyLombY", parse_mode=None)
 
 def forecast(latitude, longtitude):
     r = requests.get('https://api.open-meteo.com/v1/forecast?latitude=' + str(latitude)+'&longitude='+str(longtitude)+'&hourly=temperature_2m,apparent_temperature,rain,snowfall,relativehumidity_2m,windspeed_10m,windgusts_10m,weathercode,cloudcover&daily=sunrise,sunset,weathercode&timezone=UTC')
     return r.json()
+
+
 def weather(w_code):
     if w_code == 0 or 1 or 2:
         return 'ясненько'
@@ -21,6 +21,8 @@ def weather(w_code):
         return 'снегопад'
     elif w_code == 95 or 96 or 99:
         return 'гроза'
+
+
 def is_rainy(s1, times, rainy, code):
     s1 = datetime.now()+ timedelta(hours=12)
     all = list(zip(times, rainy, code))
@@ -32,10 +34,10 @@ def is_rainy(s1, times, rainy, code):
             rain_start = all[i][0]
             break
     if rain_start == 0:
-        return "в ближайшее время дождик не планируется"
+        return "В ближайшее время дождик не планируется"
     else:
         rain_start = datetime.fromisoformat(rain_start)
-        return "Возьмите зонтики, дождик начнется в", rain_start.strftime('%H'), "с чем-то:)"
+        return f"Возьмите зонтики, дождик начнется в {rain_start.strftime('%H')} с чем-то:)"
 
 
 def spiski(shirota, dolgota):    
@@ -50,72 +52,77 @@ def spiski(shirota, dolgota):
     a5 = fc['windspeed_10m']
     a6 = fc['windgusts_10m']
     a7 = fc['cloudcover']
-    bl = list(zip(b, a, a1, a2, a3, a4, a5, a6, a7))
-    return bl, w_code
+    bl = list(zip(b, a, a1, a2, a3, a4, a5, a6, a7,w_code))
+    return bl
+
 
 def all_weather(shirota, dolgota):
     s = datetime.now().replace(minute=0).isoformat(timespec="minutes")
-    bl, w_code = spiski()
+    bl = spiski(shirota, dolgota)
+    w_code = bl[9]
     message1 = ''
     for x in bl:
         if x[0] == s:
             message1 += str(f"Температурка: {round(x[1])}℃ 🌡 \n")
             message1 += str(f"По ощущениям: {round(x[2])} ℃ 🌡 \n")
-            message1 += str(f"Дождик: {x[3]} 🌧\n")
-            message1 += str(f"Снежок: {x[4]} ❄️\n")
+            message1 += str(f"Дождик: {x[3]} мм 🌧\n")
+            message1 += str(f"Снежок: {x[4]} мм ❄️\n")
             message1 += str(f"Влажненько: {round(x[5])} % 💧\n")
             message1 += str(f"Ветерок: {x[6]} м\с 🪁\n")
             message1 += str(f"Злой ветерок: {x[7]} м\с 🌪\n")
-            message1 += str(f"Тучки {x[8]} ☁️\n")
+            message1 += str(f"Тучки {round(x[8])} % ☁️\n")
             break
     sunrise = forecast(shirota, dolgota)['daily']['sunrise']
     sunset = forecast(shirota, dolgota)['daily']['sunset']
     message1 += str(f'Солнышко просыпается в {datetime.fromisoformat(sunrise[0]).time().isoformat(timespec="minutes")} 🌝\n')
     message1 += str(f'Солнышко засыпает в {datetime.fromisoformat(sunset[0]).time().isoformat(timespec="minutes")} 🌚\n')
-    message1 += str(f'В общем {weather(w_code)} \n') 
-    #message1 += str(is_rainy(s, b, a2, w_code))
+    message1 += str(f'В общем {weather(w_code)} ⛅\n') 
+    #message1 += str(is_rainy(s, x[0], x[3], w_code))
     return message1
+
 
 def wind(shirota, dolgota):
     s = datetime.now().replace(minute=0).isoformat(timespec="minutes")
-    bl= spiski()
+    bl= spiski(shirota, dolgota)
     for x in bl:
         if x[0] == s:
             return f"Ветерок: {x[6]} м\с 🪁\nЗлой ветерок: {x[7]} м\с 🌪"
             
 
-
 def rainy_weather(shirota, dolgota):
     s = datetime.now().replace(minute=0).isoformat(timespec="minutes")
-    bl, w_code = spiski()
+    bl = spiski(shirota, dolgota)
+    w_code = bl[9]
     message1 = ''
     for x in bl:
         if x[0] == s:
-            message1 += str(f"Дождик: {x[3]}🌧\n")
-            message1 += str(f"Снежок: {x[4]}☃️\n")
-            message1 += str(is_rainy(s, x[0], x[3], w_code))
+            message1 += str(f"Дождик: {x[3]} мм 🌧\n")
+            message1 += str(f"Снежок: {x[4]} мм ☃️\n")
+            #message1 += str(is_rainy(s, x[0], x[3], w_code))
             break
     return message1
 
 
 def cloudcover(shirota, dolgota):
     s = datetime.now().replace(minute=0).isoformat(timespec="minutes")
-    bl = spiski()
+    bl = spiski(shirota, dolgota)
     message1 = ''
     for x in bl:
         if  x[0] == s:
-            message1 +=str(f"Тучки {x[8]}☁")
+            message1 +=str(f"Тучки {round(x[8])} % ☁")
             break
     return message1
+
 
 def temperature_weather(shirota, dolgota):
     s = datetime.now().replace(minute=0).isoformat(timespec="minutes")
-    bl = spiski()
+    bl = spiski(shirota, dolgota)
     message1 = ''
     for x in bl:
         if x[0] == s:
-            message1+=str(f"Температурка:{ round(x[1])}℃ 🌡\n")
+            message1+=str(f"Температурка:{round(x[1])} ℃ 🌡 \n")
             message1+=str(f"По ощущениям:{round(x[2])} ℃ 🌡")
             break
-
     return message1
+
+#print(all_weather(55,37))
