@@ -1,8 +1,12 @@
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
+import telebot
+
+
+bot = telebot.TeleBot("5434796681:AAE2L-1SX3evqsgGZphxg-UQNCZrmyLombY", parse_mode=None)
 
 def forecast(latitude, longtitude):
-    r = requests.get('https://api.open-meteo.com/v1/forecast?latitude=' + str(latitude)+'&longitude='+str(longtitude)+'&hourly=temperature_2m,apparent_temperature,rain,snowfall,relativehumidity_2m,windspeed_10m,windgusts_10m,weathercode&daily=sunrise,sunset,weathercode&timezone=UTC')
+    r = requests.get('https://api.open-meteo.com/v1/forecast?latitude=' + str(latitude)+'&longitude='+str(longtitude)+'&hourly=temperature_2m,apparent_temperature,rain,snowfall,relativehumidity_2m,windspeed_10m,windgusts_10m,weathercode,cloudcover&daily=sunrise,sunset,weathercode&timezone=UTC')
     return r.json()
 def weather(w_code):
     if w_code == 0 or 1 or 2:
@@ -17,30 +21,61 @@ def weather(w_code):
         return 'снегопад'
     elif w_code == 95 or 96 or 99:
         return 'гроза'
-w_code = forecast(50.4422, 30.5367)['hourly']['weathercode']
+def is_rainy(s, times, rainy, code):
+    s1 = datetime.now()+ timedelta(hours=12)
+    all = list(zip(times, rainy, code))
+    time_now = int(datetime.today().strftime('%H'))
+    time_to = int(s1.strftime('%H'))
+    rain_start = 0
+    for i in range(time_now, time_to):
+        if all[i][1] > 0 and (all[i][2] == 61 or all[i][2] == 63 or all[i][2] == 65 or all[i][2] == 66 or all[i][2] == 67 or all[i][2] == 80 or all[i][2] == 81 or all[i][2] == 82 or all[i][2] == 95 or all[i][2] == 96 or all[i][2] == 99):
+            rain_start = all[i][0]
+            break
+    if rain_start == 0:
+        print("в ближайшее время дождик не планируется")
+    else:
+        rain_start = datetime.fromisoformat(rain_start)
+        print("Возьмите зонтики, дождик начнется в", rain_start.strftime('%H'), "с чем-то:)")
+
+
+
+shirota = 48.2085
+dolgota = 16.3721
+
+w_code = forecast(shirota, dolgota)['hourly']['weathercode']
 s = datetime.now().replace(minute=0).isoformat(timespec="minutes")
-s1= datetime.date
-b = forecast(50.4422, 30.5367)['hourly']['time']
-a = forecast(50.4422, 30.5367)['hourly']['temperature_2m']
-a1 = forecast(50.4422, 30.5367)['hourly']['apparent_temperature']
-a2 = forecast(50.4422, 30.5367)['hourly']['rain']
-a3 = forecast(50.4422, 30.5367)['hourly']['snowfall']
-a4 = forecast(50.4422, 30.5367)['hourly']['relativehumidity_2m']
-a5 = forecast(50.4422, 30.5367)['hourly']['windspeed_10m']
-a6 = forecast(50.4422, 30.5367)['hourly']['windgusts_10m']
-bl = list(zip(b, a, a1, a2, a3, a4, a5, a6))
-for x in bl:
-    if x[0] == s:
-        print("Температурка: ", round(x[1]), "℃ 🌡")
-        print("По ощущениям: ", round(x[2]), "℃ 🌡")
-        print("Дождик: ", x[3], "🌧")
-        print("Снежок: ", x[4], "❄️")
-        print("Влажненько: ", round(x[5]), "% 💧")
-        print("Ветерок: ", x[6], "м\с 🌬")
-        print("Злой ветерок: ", x[7], "м\с 🌪")
-        break
-sunrise = forecast(50.4422, 30.5367)['daily']['sunrise']
-sunset = forecast(50.4422, 30.5367)['daily']['sunset']
-print("Солнышко просыпается в",datetime.fromisoformat(sunrise[0]).time().isoformat(timespec="minutes"), "🌝")
-print("Солнышко засыпает в",datetime.fromisoformat(sunset[0]).time().isoformat(timespec="minutes"), "🌚")
-print("В общем ", weather(w_code))
+b = forecast(shirota, dolgota)['hourly']['time']
+a = forecast(shirota, dolgota)['hourly']['temperature_2m']
+a1 = forecast(shirota, dolgota)['hourly']['apparent_temperature']
+a2 = forecast(shirota, dolgota)['hourly']['rain']
+a3 = forecast(shirota, dolgota)['hourly']['snowfall']
+a4 = forecast(shirota, dolgota)['hourly']['relativehumidity_2m']
+a5 = forecast(shirota, dolgota)['hourly']['windspeed_10m']
+a6 = forecast(shirota, dolgota)['hourly']['windgusts_10m']
+a7 = forecast(shirota, dolgota)['hourly']['cloudcover']
+bl = list(zip(b, a, a1, a2, a3, a4, a5, a6, a7))
+
+@bot.message_handler(commands=['all'])
+def all_weather(message):
+    message1 = ''
+    for x in bl:
+        if x[0] == s:
+            message1 += str(f"Температурка: {round(x[1])}℃ 🌡")
+            message1 += str(f"По ощущениям: {round(x[2])} ℃ 🌡")
+            message1 += str(f"Дождик: {x[3]} 🌧")
+            message1 += str(f"Снежок: {x[4]} ❄️")
+            message1 += str(f"Влажненько: {round(x[5])} % 💧")
+            message1 += str(f"Ветерок: {x[6]} м\с 🌬")
+            message1 += str(f"Злой ветерок: {x[7]} м\с 🌪")
+            message1 += str(f"Тучки {x[8]} ☁️")
+            break
+    sunrise = forecast(shirota, dolgota)['daily']['sunrise']
+    sunset = forecast(shirota, dolgota)['daily']['sunset']
+    message1 += str(f'Солнышко просыпается в {datetime.fromisoformat(sunrise[0]).time().isoformat(timespec="minutes")} 🌝')
+    message1 += str(f'Солнышко засыпает в {datetime.fromisoformat(sunset[0]).time().isoformat(timespec="minutes")} 🌚')
+    message1 += str(f'В общем {weather(w_code)}') 
+    message1 += str(is_rainy(s, b, a2, w_code))
+    bot.send_message(message.chat.id, message1)
+
+
+bot.infinity_polling()
