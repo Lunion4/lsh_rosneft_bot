@@ -38,25 +38,24 @@ def is_rainy(s1, times, rainy, code):
         return "Возьмите зонтики, дождик начнется в", rain_start.strftime('%H'), "с чем-то:)"
 
 
+def spiski(shirota, dolgota):    
+    fc = forecast(shirota, dolgota)['hourly']
+    w_code = fc['weathercode']
+    b = fc['time']
+    a = fc['temperature_2m']
+    a1 = fc['apparent_temperature']
+    a2 = fc['rain']
+    a3 = fc['snowfall']
+    a4 = fc['relativehumidity_2m']
+    a5 = fc['windspeed_10m']
+    a6 = fc['windgusts_10m']
+    a7 = fc['cloudcover']
+    bl = list(zip(b, a, a1, a2, a3, a4, a5, a6, a7))
+    return bl, w_code
 
-shirota = 48.2085
-dolgota = 16.3721
-
-w_code = forecast(shirota, dolgota)['hourly']['weathercode']
-s = datetime.now().replace(minute=0).isoformat(timespec="minutes")
-b = forecast(shirota, dolgota)['hourly']['time']
-a = forecast(shirota, dolgota)['hourly']['temperature_2m']
-a1 = forecast(shirota, dolgota)['hourly']['apparent_temperature']
-a2 = forecast(shirota, dolgota)['hourly']['rain']
-a3 = forecast(shirota, dolgota)['hourly']['snowfall']
-a4 = forecast(shirota, dolgota)['hourly']['relativehumidity_2m']
-a5 = forecast(shirota, dolgota)['hourly']['windspeed_10m']
-a6 = forecast(shirota, dolgota)['hourly']['windgusts_10m']
-a7 = forecast(shirota, dolgota)['hourly']['cloudcover']
-bl = list(zip(b, a, a1, a2, a3, a4, a5, a6, a7))
-
-@bot.message_handler(commands=['all'])
-def all_weather(message):
+def all_weather(shirota, dolgota):
+    s = datetime.now().replace(minute=0).isoformat(timespec="minutes")
+    bl, w_code = spiski()
     message1 = ''
     for x in bl:
         if x[0] == s:
@@ -75,37 +74,43 @@ def all_weather(message):
     message1 += str(f'Солнышко засыпает в {datetime.fromisoformat(sunset[0]).time().isoformat(timespec="minutes")} 🌚\n')
     message1 += str(f'В общем {weather(w_code)} \n') 
     #message1 += str(is_rainy(s, b, a2, w_code))
-    bot.send_message(message.chat.id, message1)
+    return message1
 
-@bot.message_handler(commands=["wind"])
-def wind(message):
+def wind(shirota, dolgota):
+    s = datetime.now().replace(minute=0).isoformat(timespec="minutes")
+    bl= spiski()
     for x in bl:
         if x[0] == s:
-            bot.send_message(message.chat.id, f"Ветерок: {x[6]} м\с 🪁\nЗлой ветерок: {x[7]} м\с 🌪")
-            break
+            return f"Ветерок: {x[6]} м\с 🪁\nЗлой ветерок: {x[7]} м\с 🌪"
+            
 
-@bot.message_handler(commands=['rain'])
-def rainy_weather(message):
+
+def rainy_weather(shirota, dolgota):
+    s = datetime.now().replace(minute=0).isoformat(timespec="minutes")
+    bl, w_code = spiski()
     message1 = ''
     for x in bl:
         if x[0] == s:
             message1 += str(f"Дождик: {x[3]}🌧\n")
             message1 += str(f"Снежок: {x[4]}☃️\n")
-            #message1 += str(is_rainy(s, b, a2, w_code))
+            message1 += str(is_rainy(s, x[0], x[3], w_code))
             break
-    bot.send_message(message.chat.id, message1)
+    return message1
 
-@bot.message_handler(commands=['cloud'])
-def cloudcover(message):
+
+def cloudcover(shirota, dolgota):
+    s = datetime.now().replace(minute=0).isoformat(timespec="minutes")
+    bl = spiski()
     message1 = ''
     for x in bl:
         if  x[0] == s:
             message1 +=str(f"Тучки {x[8]}☁")
             break
-    bot.send_message(message.chat.id, message1)
+    return message1
 
-@bot.message_handler(commands=['temp'])
-def temperature_weather(message):
+def temperature_weather(shirota, dolgota):
+    s = datetime.now().replace(minute=0).isoformat(timespec="minutes")
+    bl = spiski()
     message1 = ''
     for x in bl:
         if x[0] == s:
@@ -113,6 +118,7 @@ def temperature_weather(message):
             message1+=str(f"По ощущениям:{round(x[2])} ℃ 🌡")
             break
 
-    bot.send_message(message.chat.id, message1)
+    return message1
 
-bot.infinity_polling()
+
+
