@@ -1,7 +1,27 @@
 import api
 import db
 import telebot
-bot = telebot.TeleBot("5434796681:AAE2L-1SX3evqsgGZphxg-UQNCZrmyLombY", parse_mode=None)
+import asyncio
+import datetime 
+
+file1 = 'TOKEN.txt'
+token = open(file1, mode='r', encoding='utf_8')
+if file1:
+    spisok = token.readlines()
+bot = telebot.TeleBot(spisok[0], parse_mode=None)
+
+# def rain_warning_one_user(user_id):
+#     shirota, dolgota = db.get_user_lon_lat(user_id)
+#     s = datetime.datetime.now().replace(minute=0).isoformat(timespec="minutes")
+#     bl,w_code = api.spiski(shirota, dolgota)
+#     message1 = str(api.is_rainy([x[0] for x in bl], [x[3] for x in bl], w_code))
+#     if message1 != "В ближайшее время дождик не планируется":
+#         bot.send_message(user_id,message1)
+
+# async def rain_warning():
+#     for user_id in db.get_all_users():
+#         rain_warning_one_user(user_id)
+#     await asyncio.sleep(21600)
 
 
 @bot.message_handler(func=lambda msg:msg.text=='Привет')
@@ -88,6 +108,7 @@ def grandmother(message):
 def grandmother(message):
     bot.send_video(message.chat.id, api.rand_meme())
 
+
+#asyncio.run(rain_warning())
+
 bot.infinity_polling()
-
-
