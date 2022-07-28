@@ -44,7 +44,7 @@ def is_rainy(times, rainy, code):
     s = datetime.now().replace(minute=0).isoformat(timespec="minutes")
     s1 = datetime.now()+ timedelta(hours=12)
     all = list(zip(times, rainy, code))
-    time_now = int(datetime.today().strftime('%H'))
+    time_now = int(datetime.utcnow().strftime('%H'))
     time_to = int(s1.strftime('%H'))
     rain_start = 0
     for i in range(time_now, time_to):
@@ -52,10 +52,10 @@ def is_rainy(times, rainy, code):
             rain_start = all[i][0]
             break
     if rain_start == 0:
-        return "в ближайшее время дождик не планируется"
+        return "В ближайшее время дождик не планируется"
     else:
         rain_start = datetime.fromisoformat(rain_start)
-        return "Возьмите зонтики, дождик начнется в", rain_start.strftime('%H'), "с чем-то:)"
+        return "Возьмите зонтики, дождик начнется в "+ str(rain_start.strftime('%H'))+" с чем-то:)"
 
 
 def spiski(shirota, dolgota):    
@@ -92,8 +92,8 @@ def all_weather(shirota, dolgota):
             break
     sunrise = forecast(shirota, dolgota)['daily']['sunrise']
     sunset = forecast(shirota, dolgota)['daily']['sunset']
-    message1 += str(f'Солнышко просыпается в {(datetime.fromisoformat(sunrise[0])+timedelta(hours=3)).time().isoformat(timespec="minutes")} 🌝\n')
-    message1 += str(f'Солнышко засыпает в {(datetime.fromisoformat(sunset[0])+timedelta(hours=3)).time().isoformat(timespec="minutes")} 🌚\n')
+    message1 += str(f'Солнышко просыпается в {(datetime.fromisoformat(sunrise[0])+timedelta(hours=3)).time().isoformat(timespec="minutes")} 🌝 (по МСК)\n')
+    message1 += str(f'Солнышко засыпает в {(datetime.fromisoformat(sunset[0])+timedelta(hours=3)).time().isoformat(timespec="minutes")} 🌚 (по МСК)\n')
     message1 += str(f'В общем {weather(w_code)} \n') 
     #message1 += str(is_rainy(s, b, a2, w_code))
     return message1
@@ -123,8 +123,9 @@ def rainy_weather(shirota, dolgota):
         if x[0] == s:
             message1 += str(f"Дождик: {x[3]}мм 🌧\n")
             message1 += str(f"Снежок: {x[4]}мм ☃️\n")
-            #message1 += str(is_rainy(x[0], x[3], w_code))
+            
             break
+    message1 += str(is_rainy([x[0] for x in bl], [x[3] for x in bl], w_code))
     return message1
 
 
@@ -149,3 +150,4 @@ def temperature_weather(shirota, dolgota):
             break
 
     return message1
+
