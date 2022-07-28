@@ -54,13 +54,14 @@ def all_w(message):
     else:
         bot.send_message(message.chat.id, api.all_weather(shirota, dolgota))
 
-@bot.message_handler(commands=['granny'])
+@bot.message_handler(commands=['pressure'])
 def grandmother(message):
     shirota, dolgota = db.get_user_lon_lat(message.chat.id)
     if shirota == None:
         bot.send_message(message.chat.id, 'Сначала введите город😡')
     else:
         bot.send_message(message.chat.id, api.pressure(shirota,dolgota))
-        bot.send_photo(message.chat.id, "https://tenor.com/view/%D0%B4%D0%BE%D0%B1%D1%80%D0%BE%D0%B5-%D1%83%D1%82%D1%80%D0%BE-%D1%86%D0%B2%D0%B5%D1%82%D1%8B-%D1%87%D0%B0%D0%B9-%D1%84%D0%B5%D1%8F-gif-16293114")
+        bot.send_photo(message.chat.id, api.rand_img())
 
 bot.infinity_polling()
+
