@@ -14,6 +14,14 @@ def rand_img():
     index = random.randint(0, len(spisok)-1)
     return spisok[index]
 
+def rand_meme():
+    file = 'gifs_meme.txt'
+    myfile = open(file, mode='r', encoding='utf_8')
+    if file:
+        spisok = myfile.readlines()
+    index = random.randint(0, len(spisok)-1)
+    return spisok[index]
+
 def forecast(latitude, longtitude):
     r = requests.get('https://api.open-meteo.com/v1/forecast?latitude=' + str(latitude)+'&longitude='+str(longtitude)+'&hourly=temperature_2m,apparent_temperature,rain,snowfall,relativehumidity_2m,windspeed_10m,windgusts_10m,weathercode,cloudcover_low,surface_pressure&daily=sunrise,sunset,weathercode&timezone=UTC')
     return r.json()
@@ -67,7 +75,7 @@ def spiski(shirota, dolgota):
     return bl, w_code
 
 def all_weather(shirota, dolgota):
-    s = datetime.now().replace(minute=0).isoformat(timespec="minutes")
+    s = datetime.utcnow().replace(minute=0).isoformat(timespec="minutes")
     bl, w_code = spiski(shirota, dolgota)
     message1 = ''
     for x in bl:
@@ -80,12 +88,12 @@ def all_weather(shirota, dolgota):
             message1 += str(f"Ветерок: {x[6]} м\с 🪁\n")
             message1 += str(f"Злой ветерок: {x[7]} м\с 🌪\n")
             message1 += str(f"Тучки: {round(x[8])} % ☁️\n")
-            message1 += str(f"Давление: {x[9]} мм рт.ст. 👵 \n")
+            message1 += str(f"Давление: {int(x[9]) *0.75} мм рт.ст. 👵 \n")
             break
     sunrise = forecast(shirota, dolgota)['daily']['sunrise']
     sunset = forecast(shirota, dolgota)['daily']['sunset']
-    message1 += str(f'Солнышко просыпается в {datetime.fromisoformat(sunrise[0]).time().isoformat(timespec="minutes")} 🌝\n')
-    message1 += str(f'Солнышко засыпает в {datetime.fromisoformat(sunset[0]).time().isoformat(timespec="minutes")} 🌚\n')
+    message1 += str(f'Солнышко просыпается в {(datetime.fromisoformat(sunrise[0])+timedelta(hours=3)).time().isoformat(timespec="minutes")} 🌝\n')
+    message1 += str(f'Солнышко засыпает в {(datetime.fromisoformat(sunset[0])+timedelta(hours=3)).time().isoformat(timespec="minutes")} 🌚\n')
     message1 += str(f'В общем {weather(w_code)} \n') 
     #message1 += str(is_rainy(s, b, a2, w_code))
     return message1
@@ -102,7 +110,7 @@ def pressure(shirota, dolgota):
     message1=''
     for x in bl:
         if x[0] == s:
-            message1 += str(f"Давление: {x[9]} мм рт.ст. 👵 \n") 
+            message1 += str(f"Давление: {int(x[9])*0.75} мм рт.ст. 👵 \n") 
             break
     return message1         
 
