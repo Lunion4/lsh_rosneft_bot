@@ -4,7 +4,8 @@ from telebot import types
 import api
 
 
-bot = telebot.TeleBot('5581359766:AAHjoVpBIEIlZ_b9yKXvxwK09Fv5XyFFbS8')
+
+bot = telebot.TeleBot(open('config.txt').readline())
 shirota = 55
 dolgota = 37
 
@@ -41,6 +42,27 @@ def start(message):
     types.KeyboardButton(text='/wind'),types.KeyboardButton(text='/rainy_weather'),types.KeyboardButton(text='/cloudcover')).add(types.KeyboardButton(text='/all_weather'))
 
     bot.send_message(message.chat.id, "Выберете из меню", reply_markup=keyboard)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 bot.infinity_polling()
