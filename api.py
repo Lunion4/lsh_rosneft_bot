@@ -18,10 +18,12 @@ def forecast(latitude, longtitude):
     r = requests.get('https://api.open-meteo.com/v1/forecast?latitude=' + str(latitude)+'&longitude='+str(longtitude)+'&hourly=temperature_2m,apparent_temperature,rain,snowfall,relativehumidity_2m,windspeed_10m,windgusts_10m,weathercode,cloudcover,surface_pressure&daily=sunrise,sunset,weathercode&timezone=UTC')
     return r.json()
 def weather(w_code):
-    if w_code == 0 or 1 or 2:
+    if w_code == 0 or 1:
         return 'ясненько'
-    elif w_code == 3 or 45 or 48:
+    elif w_code == 2 or 3:
         return 'пасмурненько'
+    elif w_code == 45 or 48:
+        return 'туманно'
     elif w_code == 51 or 53 or 56 or 61 or 66:
         return 'добрый дождик'
     elif w_code == 55 or 57 or 63 or 65 or 67 or 80 or 81 or 82:
