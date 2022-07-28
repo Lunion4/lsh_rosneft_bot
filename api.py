@@ -15,7 +15,7 @@ def rand_img():
     return spisok[index]
 
 def forecast(latitude, longtitude):
-    r = requests.get('https://api.open-meteo.com/v1/forecast?latitude=' + str(latitude)+'&longitude='+str(longtitude)+'&hourly=temperature_2m,apparent_temperature,rain,snowfall,relativehumidity_2m,windspeed_10m,windgusts_10m,weathercode,cloudcover,surface_pressure&daily=sunrise,sunset,weathercode&timezone=UTC')
+    r = requests.get('https://api.open-meteo.com/v1/forecast?latitude=' + str(latitude)+'&longitude='+str(longtitude)+'&hourly=temperature_2m,apparent_temperature,rain,snowfall,relativehumidity_2m,windspeed_10m,windgusts_10m,weathercode,cloudcover_low,surface_pressure&daily=sunrise,sunset,weathercode&timezone=UTC')
     return r.json()
 def weather(w_code):
     if w_code == 0 or 1:
@@ -61,7 +61,7 @@ def spiski(shirota, dolgota):
     a4 = fc['relativehumidity_2m']
     a5 = fc['windspeed_10m']
     a6 = fc['windgusts_10m']
-    a7 = fc['cloudcover']
+    a7 = fc['cloudcover_low']
     a8 = fc['surface_pressure']
     bl = list(zip(b, a, a1, a2, a3, a4, a5, a6, a7, a8))
     return bl, w_code
