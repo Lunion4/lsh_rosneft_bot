@@ -3,9 +3,6 @@ import db
 import telebot
 bot = telebot.TeleBot("5434796681:AAE2L-1SX3evqsgGZphxg-UQNCZrmyLombY", parse_mode=None)
 
-@bot.message_handler(func=lambda msg:msg.text=='Сменить город')
-def change_city(message):
-    welcome(message)
 
 @bot.message_handler(func=lambda msg:msg.text=='Привет')
 def hello_key(message):
@@ -33,6 +30,8 @@ def save_city(message):
         bot.register_next_step_handler(message, save_city)
 
 @bot.message_handler(func=lambda msg:msg.text=='Сменить город')
+def change_city(message):
+    welcome(message)
 
 
 @bot.message_handler(func=lambda msg:msg.text=='🌪')
