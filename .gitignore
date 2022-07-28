@@ -1,1 +1,2 @@
 TOKEN
+bot = telebot.TeleBot("5434796681:AAE2L-1SX3evqsgGZphxg-UQNCZrmyLombY", parse_mode=None)
