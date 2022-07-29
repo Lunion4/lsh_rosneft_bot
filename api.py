@@ -82,8 +82,8 @@ def all_weather(shirota, dolgota):
             message1 += str(f"Дождик: {x[3]} мм 🌧\n")
             message1 += str(f"Снежок: {x[4]} мм ❄️\n")
             message1 += str(f"Влажненько: {round(x[5])} % 💧\n")
-            message1 += str(f"Ветерок: {x[6]} м🧨с 🪁\n")
-            message1 += str(f"Злой ветерок: {x[7]} м🧨с 🌪\n")
+            message1 += str(f"Ветерок: {x[6]} м/с 🪁\n")
+            message1 += str(f"Злой ветерок: {x[7]} м/с 🌪\n")
             message1 += str(f"Тучки: {round(x[8])} % ☁️\n")
             message1 += str(f"Давление: {int(x[9]) *0.75} мм рт.ст. 👵 \n")
             break
@@ -91,7 +91,7 @@ def all_weather(shirota, dolgota):
     sunset = forecast(shirota, dolgota)['daily']['sunset']
     message1 += str(f'Солнышко просыпается в {(datetime.fromisoformat(sunrise[0])+timedelta(hours=3)).time().isoformat(timespec="minutes")} 🌝 (по МСК)\n')
     message1 += str(f'Солнышко засыпает в {(datetime.fromisoformat(sunset[0])+timedelta(hours=3)).time().isoformat(timespec="minutes")} 🌚 (по МСК)\n')
-
+    return message1
 
 def wind(shirota, dolgota):
     s = datetime.utcnow().replace(minute=0).isoformat(timespec="minutes")
